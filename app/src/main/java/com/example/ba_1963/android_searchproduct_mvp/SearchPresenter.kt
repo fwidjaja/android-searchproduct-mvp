@@ -4,26 +4,10 @@ import com.example.ba_1963.android_searchproduct_mvp.model.ui.DataItemUiModel
 
 
 class SearchPresenter(private val view: SearchContract.View, private val dataSource: SearchDataSource) : SearchContract.Presenter {
-    private var currentPage = 1
-
-    override fun update(q: String?) {
-        currentPage = 1
-        view.showLoading(true)
-        dataSource.getData(
-                q = q,
-                start = currentPage,
-                onSuccess = { datas ->
-                    val items = mutableListOf<DataItemUiModel>()
-
-                    datas?.let { data ->
-                        items.addAll(data)
-                    }
-                    view.update(items)
-                    view.showLoading(false)
-                })
-    }
+    private var currentPage = 0
 
     override fun search(q: String?, start: Int) {
+        currentPage = 0
         view.showLoading(true)
         dataSource.getData(
                 q = q,
@@ -42,7 +26,7 @@ class SearchPresenter(private val view: SearchContract.View, private val dataSou
     override fun onEndListReached(q: String?) {
         dataSource.getData(
                 q = q,
-                start = currentPage + 1,
+                start = currentPage + 10,
                 onSuccess = { datas ->
                     val newItems = mutableListOf<DataItemUiModel>()
 
@@ -50,7 +34,7 @@ class SearchPresenter(private val view: SearchContract.View, private val dataSou
                         newItems.addAll(data)
                     }
                     view.loadNextPage(newItems = newItems)
-                    currentPage++
+                    currentPage += 10
                 })
     }
 }
